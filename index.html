@@ -11,7 +11,6 @@
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
-
         body {
             background-color: #0e1118;
             color: #e3e6ed;
@@ -20,8 +19,6 @@
             height: 100vh;
             overflow: hidden;
         }
-
-        /* Barra superiore */
         header {
             background-color: #161b26;
             padding: 15px;
@@ -29,20 +26,16 @@
             border-bottom: 1px solid #242c3d;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-
         header h1 {
             font-size: 1.2rem;
             color: #4f46e5;
             letter-spacing: 1px;
             text-transform: uppercase;
         }
-
         header p {
             font-size: 0.8rem;
             color: #8fa0dd;
         }
-
-        /* Contenitore Messaggi */
         #chat-container {
             flex: 1;
             overflow-y: auto;
@@ -51,7 +44,6 @@
             flex-direction: column;
             gap: 15px;
         }
-
         .message {
             max-width: 85%;
             padding: 12px 16px;
@@ -60,14 +52,12 @@
             line-height: 1.4;
             word-wrap: break-word;
         }
-
         .user-message {
             background-color: #4f46e5;
             color: #ffffff;
             align-self: flex-end;
             border-bottom-right-radius: 4px;
         }
-
         .ai-message {
             background-color: #1c2333;
             color: #e3e6ed;
@@ -75,8 +65,6 @@
             border-bottom-left-radius: 4px;
             border: 1px solid #2d374d;
         }
-
-        /* Barra di Input in basso */
         #input-container {
             background-color: #161b26;
             padding: 12px;
@@ -85,7 +73,6 @@
             border-top: 1px solid #242c3d;
             align-items: center;
         }
-
         #message-input {
             flex: 1;
             background-color: #0e1118;
@@ -96,11 +83,9 @@
             font-size: 1rem;
             outline: none;
         }
-
         #message-input:focus {
             border-color: #4f46e5;
         }
-
         #send-btn {
             background-color: #4f46e5;
             border: none;
@@ -112,30 +97,25 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-
         #send-btn:active {
             background-color: #3b31c8;
         }
     </style>
 </head>
 <body>
-
     <header>
         <h1>Gemini Tech</h1>
         <p>L'IA sempre attiva per il modding e la tecnologia</p>
     </header>
-
     <div id="chat-container">
         <div class="message ai-message">
             Ehi! Sono la tua IA dedicata. Pronto a configurare qualche server, smanettare con Linux o fare modding estremo? Chiedimi qualsiasi cosa! 🛠️
         </div>
     </div>
-
     <div id="input-container">
         <input type="text" id="message-input" placeholder="Scrivi un messaggio..." autocomplete="off">
         <button id="send-btn">Invia</button>
     </div>
-
     <script>
         const chatContainer = document.getElementById('chat-container');
         const messageInput = document.getElementById('message-input');
@@ -156,7 +136,6 @@
             appendMessage(text, 'user');
             messageInput.value = '';
 
-            // Piccolo indicatore di caricamento
             const tempMsg = document.createElement('div');
             tempMsg.classList.add('message', 'ai-message');
             tempMsg.textContent = 'Sta scrivendo...';
@@ -178,7 +157,6 @@
                 appendMessage("Errore di connessione. Controlla il server!", 'ai');
             }
         }
-
         sendBtn.addEventListener('click', sendMessage);
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
@@ -186,3 +164,4 @@
     </script>
 </body>
 </html>
+
