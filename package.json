@@ -5,6 +5,7 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
+    "build": "npm install",
     "start": "node server.js"
   },
   "dependencies": {
@@ -13,3 +14,5 @@
     "dotenv": "^16.4.5"
   }
 }
+
+  
