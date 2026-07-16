@@ -1,189 +1,26 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Tech Bot</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+async function sendMessage() {
+    const userInput = document.getElementById('user-input');
+    const text = userInput.value.trim();
+    if (!text) return;
+
+    // Aggiungi il messaggio dell'utente alla chat...
+    userInput.value = '';
+
+    try {
+        // Chiamiamo il NOSTRO server, non Google direttamente
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text })
+        });
+
+        const data = await response.json();
+        if (data.reply) {
+            // Aggiungi la risposta del bot alla chat...
+        } else {
+            alert("Errore: " + data.error);
         }
-
-        body {
-            background-color: #0b141a;
-            color: #e9edef;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        header {
-            background-color: #202c33;
-            padding: 15px;
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border-bottom: 1px solid #374248;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        #chat-container {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .message {
-            max-width: 75%;
-            padding: 10px 15px;
-            border-radius: 8px;
-            line-height: 1.4;
-            word-wrap: break-word;
-            font-size: 0.95rem;
-        }
-
-        .user-message {
-            background-color: #005c4b;
-            color: #e9edef;
-            align-self: flex-end;
-            border-top-right-radius: 0;
-        }
-
-        .bot-message {
-            background-color: #202c33;
-            color: #e9edef;
-            align-self: flex-start;
-            border-top-left-radius: 0;
-        }
-
-        .error-message {
-            background-color: #5a1e1e;
-            color: #fbd3d3;
-            align-self: center;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            text-align: center;
-            max-width: 90%;
-        }
-
-        #input-container {
-            background-color: #202c33;
-            padding: 15px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        input {
-            flex: 1;
-            background-color: #2a3942;
-            border: none;
-            color: #fff;
-            padding: 12px 15px;
-            border-radius: 8px;
-            font-size: 1rem;
-            outline: none;
-        }
-
-        input::placeholder {
-            color: #8696a0;
-        }
-
-        button {
-            background-color: #00a884;
-            color: #111b21;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        button:hover {
-            background-color: #008f72;
-        }
-    </style>
-</head>
-<body>
-
-    <header>🤖 Gemini Tech Bot</header>
-
-    <div id="chat-container">
-        <div class="message bot-message">Chiedimi pure qualsiasi cosa su Linux, programmazione, emulatori o tecnologia! 🚀</div>
-    </div>
-
-    <div id="input-container">
-        <input type="text" id="user-input" placeholder="Scrivi un messaggio..." onkeypress="handleKeyPress(event)">
-        <button onclick="sendMessage()">Invia</button>
-    </div>
-
-    <script>
-        const chatContainer = document.getElementById('chat-container');
-        const userInput = document.getElementById('user-input');
-
-        // CHIAVE CORRETTA AL 100% (Sistemata la 'j')
-        const API_KEY = "AIzaSyBXYKxdg9ja3oEyUHrys_CGTJpPjNBw3LU"; 
-
-        function appendMessage(text, isUser, isError = false) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-            if (isError) {
-                messageDiv.classList.add('error-message');
-            } else {
-                messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
-            }
-            messageDiv.textContent = text;
-            chatContainer.appendChild(messageDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-        async function sendMessage() {
-            const text = userInput.value.trim();
-            if (!text) return;
-
-            appendMessage(text, true);
-            userInput.value = '';
-
-            try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
-
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: text }] }]
-                    })
-                });
-
-                const data = await response.json();
-                
-                if (response.ok && data.candidates && data.candidates[0].content.parts[0].text) {
-                    const reply = data.candidates[0].content.parts[0].text;
-                    appendMessage(reply, false);
-                } else {
-                    const errorMsg = data.error?.message || "Errore di risposta da Google.";
-                    appendMessage("Errore: " + errorMsg, false, true);
-                }
-            } catch (error) {
-                appendMessage("Errore di connessione a Gemini.", false, true);
-            }
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-    </script>
-</body>
-</html>
+    } catch (error) {
+        alert("Errore di connessione al server.");
+    }
+}
