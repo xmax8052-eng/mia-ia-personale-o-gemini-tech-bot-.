@@ -129,8 +129,8 @@
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
 
-        // Chiave API corretta inserita al 100%
-        const API_KEY = "AIzaSyBXYKxdg9ia3oEyUHrys_CGTJpPjNBw3LU"; 
+        // CHIAVE CORRETTA AL 100% (Sistemata la 'j')
+        const API_KEY = "AIzaSyBXYKxdg9ja3oEyUHrys_CGTJpPjNBw3LU"; 
 
         function appendMessage(text, isUser, isError = false) {
             const messageDiv = document.createElement('div');
@@ -153,7 +153,6 @@
             userInput.value = '';
 
             try {
-                // Chiamata front-end diretta e sicura a Google Gemini 1.5 Flash
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
                 const response = await fetch(url, {
