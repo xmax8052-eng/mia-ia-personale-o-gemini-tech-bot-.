@@ -12,6 +12,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Inizializzazione di Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.use(express.json());
@@ -23,18 +24,28 @@ app.post('/api/chat', async (req, res) => {
   try {
     const { message } = req.body;
     
+    if (!message) {
+      return res.status(400).json({ error: 'Messaggio vuoto.' });
+    }
+
     const model = genAI.getGenerativeModel({ 
       model: 'gemini-1.5-flash',
       systemInstruction: systemInstruction
     });
     
-    const result = await model.generateContent(message);
+    // Passiamo il testo formattandolo come richiesto dall'SDK
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: message }] }]
+    });
+    
     const response = await result.response;
+    const responseText = response.text();
 
-    res.json({ reply: response.text() });
+    res.json({ reply: responseText });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Errore durante la connessione a Gemini.' });
+    // Stampiamo l'errore completo per vederlo chiaramente nei log di Render
+    console.error("ERRORE DETTAGLIATO DI GEMINI:", error.message || error);
+    res.status(500).json({ error: error.message || 'Errore durante la connessione a Gemini.' });
   }
 });
 
