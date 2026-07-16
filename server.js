@@ -25,22 +25,20 @@ app.post('/api/chat', async (req, res) => {
       return res.status(400).json({ error: 'Messaggio vuoto.' });
     }
 
-    // Prendiamo la chiave direttamente quando l'utente clicca invia
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return res.status(500).json({ error: 'Chiave API non trovata nelle configurazioni di Render.' });
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
+    
+    // Usiamo il vecchio modello 'gemini-pro' per aggirare il 404 delle vecchie librerie
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',
+      model: 'gemini-pro',
       systemInstruction: systemInstruction
     });
     
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: message }] }]
-    });
-    
+    const result = await model.generateContent(message);
     const response = await result.response;
     const responseText = response.text();
 
@@ -58,3 +56,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Server attivo sulla porta ${port}`);
 });
+
+    
