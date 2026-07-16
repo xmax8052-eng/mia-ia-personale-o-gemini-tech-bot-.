@@ -14,8 +14,6 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(__dirname));
 
-const systemInstruction = `Tu sei un'assistente IA amichevole, brillante e con un'immensa passione per la tecnologia, l'informatica e il modding. Adori parlare di Linux, emulatori retro-gaming, programmazione e modifiche software. Parli in modo informale e amichevole.`;
-
 app.post('/api/chat', async (req, res) => {
   try {
     const { message } = req.body;
@@ -26,44 +24,37 @@ app.post('/api/chat', async (req, res) => {
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      return res.status(500).json({ error: 'Chiave API non trovata su Render.' });
+      return res.status(500).json({ error: 'Chiave API non trovata.' });
     }
 
-    // Endpoint stabile v1 per evitare qualsiasi 404
+    // Endpoint pulito e stabile v1
     const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-    // Struttura JSON valida al 100% per l'endpoint v1 stabile
+    // Richiesta ridotta all'osso, impossibile da sbagliare per Google
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        contents: [
-          { 
-            role: "user", 
-            parts: [{ text: message }] 
-          }
-        ],
-        systemInstruction: {
-          role: "system",
-          parts: [{ text: systemInstruction }]
-        }
+        contents: [{
+          parts: [{ text: message }]
+        }]
       })
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error?.message || 'Errore nella risposta di Google.');
+      throw new Error(data.error?.message || 'Errore di risposta.');
     }
 
     const responseText = data.candidates[0].content.parts[0].text;
     res.json({ reply: responseText });
 
   } catch (error) {
-    console.error("ERRORE DIETRO LE QUINTE:", error.message || error);
-    res.status(500).json({ error: error.message || 'Errore durante la connessione a Gemini.' });
+    console.error("ERRORE:", error.message || error);
+    res.status(500).json({ error: error.message || 'Errore di connessione.' });
   }
 });
 
