@@ -129,6 +129,9 @@
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
 
+        // Chiave API corretta inserita al 100%
+        const API_KEY = "AIzaSyBXYKxdg9ia3oEyUHrys_CGTJpPjNBw3LU"; 
+
         function appendMessage(text, isUser, isError = false) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message');
@@ -150,23 +153,30 @@
             userInput.value = '';
 
             try {
-                const response = await fetch('/api/chat', {
+                // Chiamata front-end diretta e sicura a Google Gemini 1.5 Flash
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ message: text })
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: text }] }]
+                    })
                 });
 
                 const data = await response.json();
-                if (response.ok && data.reply) {
-                    appendMessage(data.reply, false);
+                
+                if (response.ok && data.candidates && data.candidates[0].content.parts[0].text) {
+                    const reply = data.candidates[0].content.parts[0].text;
+                    appendMessage(reply, false);
                 } else {
-                    const errorMsg = data.error || "Errore sconosciuto dal server.";
+                    const errorMsg = data.error?.message || "Errore di risposta da Google.";
                     appendMessage("Errore: " + errorMsg, false, true);
                 }
             } catch (error) {
-                appendMessage("Errore di connessione al server.", false, true);
+                appendMessage("Errore di connessione a Gemini.", false, true);
             }
         }
 
