@@ -27,10 +27,9 @@ app.post('/api/chat', async (req, res) => {
       return res.status(500).json({ error: 'Chiave API non trovata.' });
     }
 
-    // Endpoint pulito e stabile v1
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // Usiamo l'endpoint di fallback universale per le chiamate HTTP dirette
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`;
 
-    // Richiesta ridotta all'osso, impossibile da sbagliare per Google
     const response = await fetch(url, {
       method: 'POST',
       headers: {
