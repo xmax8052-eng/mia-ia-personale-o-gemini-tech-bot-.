@@ -29,8 +29,8 @@ app.post('/api/chat', async (req, res) => {
       return res.status(500).json({ error: 'Chiave API non trovata su Render.' });
     }
 
-    // Usiamo v1beta con la sintassi corretta "system_instruction" per la fetch diretta
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // Endpoint stabile v1 per evitare il 404
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -39,7 +39,7 @@ app.post('/api/chat', async (req, res) => {
       },
       body: JSON.stringify({
         contents: [{ parts: [{ text: message }] }],
-        system_instruction: { parts: [{ text: systemInstruction }] }
+        systemInstruction: { parts: [{ text: systemInstruction }] }
       })
     });
 
