@@ -1,5 +1,4 @@
 import express from 'express';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -27,24 +26,34 @@ app.post('/api/chat', async (req, res) => {
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      return res.status(500).json({ error: 'Chiave API non trovata nelle configurazioni di Render.' });
+      return res.status(500).json({ error: 'Chiave API non trovata su Render.' });
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    
-    // Usiamo il vecchio modello 'gemini-pro' per aggirare il 404 delle vecchie librerie
-    const model = genAI.getGenerativeModel({ 
-      model: 'gemini-pro',
-      systemInstruction: systemInstruction
-    });
-    
-    const result = await model.generateContent(message);
-    const response = await result.response;
-    const responseText = response.text();
+    // Facciamo una chiamata diretta all'API stabile v1 di Google Gemini 1.5 Flash
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: message }] }],
+        systemInstruction: { parts: [{ text: systemInstruction }] }
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error?.message || 'Errore nella risposta di Google.');
+    }
+
+    const responseText = data.candidates[0].content.parts[0].text;
     res.json({ reply: responseText });
+
   } catch (error) {
-    console.error("ERRORE DETTAGLIATO DI GEMINI:", error.message || error);
+    console.error("ERRORE DIETRO LE QUINTE:", error.message || error);
     res.status(500).json({ error: error.message || 'Errore durante la connessione a Gemini.' });
   }
 });
@@ -56,5 +65,3 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Server attivo sulla porta ${port}`);
 });
-
-    
