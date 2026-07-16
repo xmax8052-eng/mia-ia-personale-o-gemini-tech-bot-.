@@ -29,17 +29,26 @@ app.post('/api/chat', async (req, res) => {
       return res.status(500).json({ error: 'Chiave API non trovata su Render.' });
     }
 
-    // Endpoint stabile v1 per evitare il 404
+    // Endpoint stabile v1 per evitare qualsiasi 404
     const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
+    // Struttura JSON valida al 100% per l'endpoint v1 stabile
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: message }] }],
-        systemInstruction: { parts: [{ text: systemInstruction }] }
+        contents: [
+          { 
+            role: "user", 
+            parts: [{ text: message }] 
+          }
+        ],
+        systemInstruction: {
+          role: "system",
+          parts: [{ text: systemInstruction }]
+        }
       })
     });
 
